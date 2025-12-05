@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  dev:
+    build:
+      context: ./code
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
+    volumes:
+      - ./code:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+  build:
+    build:
+      context: ./code
+      dockerfile: Dockerfile
+    image: atomic-portfolio:latest
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  exporter:
+    image: atomic-portfolio:latest
+    depends_on:
+      - build
+    volumes:
+      - ./:/tmp/export
+    command: /bin/sh -c "mkdir -p /tmp/export && cp -r /usr/share/nginx/html/* /tmp/export/"
+    restart: 'no'
