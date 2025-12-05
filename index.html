@@ -1,145 +1,176 @@
 <!doctype html>
 <html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capy Snake - Nuit de l'Info 2025</title>
+    <meta name="description" content="Un jeu de Snake 3D avec un Capybara, développé pour la Nuit de l'Info 2025. Thème : L'Océan ?" />
+    <meta name="author" content="Team Capy" />
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Capy Snake - Nuit de l'Info 2025</title>
-  <meta name="description"
-    content="Un jeu de Snake 3D avec un Capybara, développé pour la Nuit de l'Info 2025. Thème : L'Océan ?" />
-  <meta name="author" content="Team Capy" />
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Favicon (Peanut Emoji) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥜</text></svg>">
 
-  <!-- Favicon (Capybara Emoji) -->
-  <link rel="icon"
-    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>�</text></svg>">
-
-  <style>
-    :root {
-      --bg-gradient: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-      --text-color: #ffffff;
-      --accent-color: #4FC3F7;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg-gradient);
-      color: var(--text-color);
-      font-family: 'Outfit', sans-serif;
-      overflow: hidden;
-      /* Hide scrollbars for the game */
-      height: 100vh;
-      width: 100vw;
-    }
-
-    #root {
-      width: 100%;
-      height: 100%;
-    }
-
-    /* Overlay Elements */
-    .overlay-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent);
-      pointer-events: none;
-      /* Let clicks pass through to game */
-      z-index: 1000;
-      box-sizing: border-box;
-    }
-
-    .overlay-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      padding: 0.5rem 2rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
-      pointer-events: none;
-      z-index: 1000;
-      font-size: 0.8rem;
-      opacity: 0.7;
-    }
-
-    .brand {
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: var(--accent-color);
-      text-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
-    }
-
-    .event-info {
-      font-weight: 300;
-      font-size: 1rem;
-      opacity: 0.8;
-    }
-
-    /* Loading State */
-    .loading-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .loader {
-      width: 48px;
-      height: 48px;
-      border: 5px solid #FFF;
-      border-bottom-color: var(--accent-color);
-      border-radius: 50%;
-      display: inline-block;
-      box-sizing: border-box;
-      animation: rotation 1s linear infinite;
-    }
-
-    @keyframes rotation {
-      0% {
-        transform: rotate(0deg);
+    <style>
+      :root {
+        --bg-color: #050505;
+        --text-color: #e0e0e0;
+        --accent-primary: #00f3ff; /* Cyan */
+        --accent-secondary: #bc13fe; /* Purple */
+        --grid-color: rgba(0, 243, 255, 0.1);
       }
 
-      100% {
-        transform: rotate(360deg);
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-color);
+        background-image: 
+          linear-gradient(var(--grid-color) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+        background-size: 40px 40px;
+        background-position: center center;
+        color: var(--text-color);
+        font-family: 'Outfit', sans-serif;
+        overflow: hidden;
+        height: 100vh;
+        width: 100vw;
       }
-    }
-  </style>
-</head>
 
-<body>
-  <!-- Overlay UI -->
-  <header class="overlay-header">
-    <div class="brand">CAPY SNAKE</div>
-    <div class="event-info">Nuit de l'Info 2025</div>
-  </header>
+      #root {
+        width: 100%;
+        height: 100%;
+      }
 
-  <div id="root">
-    <div class="loading-container">
-      <span class="loader"></span>
-      <p>Chargement du Capybara...</p>
+      /* Overlay Elements */
+      .overlay-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 1.5rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(to bottom, rgba(5, 5, 5, 0.9), transparent);
+        pointer-events: none;
+        z-index: 1000;
+        box-sizing: border-box;
+        border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+        box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+      }
+
+      .overlay-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(to top, rgba(5, 5, 5, 0.9), transparent);
+        pointer-events: none;
+        z-index: 1000;
+        font-size: 0.9rem;
+        border-top: 1px solid rgba(188, 19, 254, 0.2);
+      }
+
+      .brand {
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 700;
+        font-size: 2rem;
+        color: var(--accent-primary);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-shadow: 
+          0 0 5px var(--accent-primary),
+          0 0 10px var(--accent-primary);
+        position: relative;
+      }
+
+      .brand::after {
+        content: 'v1.0';
+        font-size: 0.8rem;
+        position: absolute;
+        bottom: -5px;
+        right: -30px;
+        color: var(--accent-secondary);
+        text-shadow: none;
+      }
+
+      .event-info {
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 400;
+        font-size: 1rem;
+        color: var(--accent-secondary);
+        letter-spacing: 1px;
+        text-shadow: 0 0 5px rgba(188, 19, 254, 0.5);
+      }
+
+      /* Loading State */
+      .loading-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        flex-direction: column;
+        gap: 1.5rem;
+        background: radial-gradient(circle at center, rgba(0, 243, 255, 0.05), transparent 70%);
+      }
+
+      .loader {
+        width: 60px;
+        height: 60px;
+        border: 3px solid transparent;
+        border-top-color: var(--accent-primary);
+        border-right-color: var(--accent-secondary);
+        border-radius: 50%;
+        animation: rotation 1s linear infinite;
+        box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+      }
+
+      .loading-text {
+        font-family: 'Orbitron', sans-serif;
+        color: var(--text-color);
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes rotation {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      @keyframes pulse {
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Overlay UI -->
+    <header class="overlay-header">
+      <div class="brand">CAPY SNAKE</div>
+      <div class="event-info">NUIT DE L'INFO 2025</div>
+    </header>
+
+    <div id="root">
+      <div class="loading-container">
+        <span class="loader"></span>
+        <p class="loading-text">INITIALISATION DU CAPYBARA...</p>
+      </div>
     </div>
-  </div>
 
-  <footer class="overlay-footer">
-    <p>Développé avec ❤️ par la Team Capy • Sujet : L'Océan ?</p>
-  </footer>
+    <footer class="overlay-footer">
+      <p>SYSTEME DEVELOPPE PAR LA TEAM CAPY • SUJET : L'OCEAN ?</p>
+    </footer>
 
-  <script type="module" src="/src/index.jsx"></script>
-</body>
-
+    <script type="module" src="/src/index.jsx"></script>
+  </body>
 </html>

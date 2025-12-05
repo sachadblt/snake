@@ -18,9 +18,13 @@ const Container = styled.div`
   justify-content: center;
   height: 100vh;
   width: 100vw;
-  background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-  color: #fff;
-  font-family: 'Outfit', sans-serif;
+  background-color: #050505;
+  background-image: 
+    linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px);
+  background-size: 40px 40px;
+  color: #e0e0e0;
+  font-family: 'Orbitron', sans-serif;
   text-align: center;
   animation: ${fadeIn} 1s ease-in-out;
 `;
@@ -30,8 +34,10 @@ const Title = styled.h1`
   margin-bottom: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.5rem;
-  text-shadow: 0 0 20px rgba(79, 195, 247, 0.6);
-  color: #4FC3F7;
+  text-shadow: 
+    0 0 10px #00f3ff,
+    0 0 20px #00f3ff;
+  color: #00f3ff;
 
   @media (max-width: 768px) {
     font-size: 2.5rem;
@@ -41,8 +47,10 @@ const Title = styled.h1`
 const Subtitle = styled.p`
   font-size: 1.5rem;
   margin-bottom: 3rem;
-  font-weight: 300;
-  opacity: 0.8;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: #bc13fe;
+  text-shadow: 0 0 5px rgba(188, 19, 254, 0.5);
 `;
 
 const CodeDisplay = styled.div`
@@ -64,93 +72,96 @@ const Key = styled.span`
   justify-content: center;
   width: 60px;
   height: 60px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(0, 243, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(0, 243, 255, 0.05);
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
   transition: all 0.2s;
-  color: ${props => props.$active ? '#4FC3F7' : 'inherit'};
-  border-color: ${props => props.$active ? '#4FC3F7' : 'rgba(255, 255, 255, 0.3)'};
+  color: ${props => props.$active ? '#00f3ff' : 'rgba(255, 255, 255, 0.5)'};
+  border-color: ${props => props.$active ? '#00f3ff' : 'rgba(0, 243, 255, 0.3)'};
   transform: ${props => props.$active ? 'scale(1.1)' : 'scale(1)'};
-  box-shadow: ${props => props.$active ? '0 0 15px rgba(79, 195, 247, 0.5)' : '0 4px 15px rgba(0, 0, 0, 0.2)'};
+  box-shadow: ${props => props.$active ? '0 0 20px rgba(0, 243, 255, 0.6)' : '0 0 10px rgba(0, 243, 255, 0.1)'};
+  font-family: 'Outfit', sans-serif; /* Keep arrows readable */
 `;
 
 const Hint = styled.div`
   margin-top: 2rem;
   font-size: 1.2rem;
   animation: ${blink} 2s infinite;
-  color: #FFD54F;
+  color: #bc13fe;
+  letter-spacing: 2px;
+  text-shadow: 0 0 5px rgba(188, 19, 254, 0.5);
 `;
 
 const KONAMI_CODE = [
-    'ArrowUp', 'ArrowUp',
-    'ArrowDown', 'ArrowDown',
-    'ArrowLeft', 'ArrowRight',
-    'ArrowLeft', 'ArrowRight',
-    'b', 'a'
+  'ArrowUp', 'ArrowUp',
+  'ArrowDown', 'ArrowDown',
+  'ArrowLeft', 'ArrowRight',
+  'ArrowLeft', 'ArrowRight',
+  'b', 'a'
 ];
 
 const KonamiLanding = ({ onUnlock }) => {
-    const [inputSequence, setInputSequence] = useState([]);
+  const [inputSequence, setInputSequence] = useState([]);
 
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            const { key } = e;
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const { key } = e;
 
-            setInputSequence((prev) => {
-                const newSequence = [...prev, key];
+      setInputSequence((prev) => {
+        const newSequence = [...prev, key];
 
-                // Check if the new sequence matches the beginning of the Konami code
-                const isMatchSoFar = newSequence.every((k, i) => k === KONAMI_CODE[i]);
+        // Check if the new sequence matches the beginning of the Konami code
+        const isMatchSoFar = newSequence.every((k, i) => k === KONAMI_CODE[i]);
 
-                if (!isMatchSoFar) {
-                    // If wrong key, reset, but check if the key itself starts the sequence (ArrowUp)
-                    return key === KONAMI_CODE[0] ? [key] : [];
-                }
+        if (!isMatchSoFar) {
+          // If wrong key, reset, but check if the key itself starts the sequence (ArrowUp)
+          return key === KONAMI_CODE[0] ? [key] : [];
+        }
 
-                if (newSequence.length === KONAMI_CODE.length) {
-                    onUnlock();
-                    return [];
-                }
+        if (newSequence.length === KONAMI_CODE.length) {
+          onUnlock();
+          return [];
+        }
 
-                return newSequence;
-            });
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [onUnlock]);
-
-    const renderKey = (key, index) => {
-        let label = key;
-        if (key === 'ArrowUp') label = '↑';
-        if (key === 'ArrowDown') label = '↓';
-        if (key === 'ArrowLeft') label = '←';
-        if (key === 'ArrowRight') label = '→';
-        if (key === 'b') label = 'B';
-        if (key === 'a') label = 'A';
-
-        const isActive = index < inputSequence.length;
-
-        return (
-            <Key key={index} $active={isActive}>
-                {label}
-            </Key>
-        );
+        return newSequence;
+      });
     };
 
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onUnlock]);
+
+  const renderKey = (key, index) => {
+    let label = key;
+    if (key === 'ArrowUp') label = '↑';
+    if (key === 'ArrowDown') label = '↓';
+    if (key === 'ArrowLeft') label = '←';
+    if (key === 'ArrowRight') label = '→';
+    if (key === 'b') label = 'B';
+    if (key === 'a') label = 'A';
+
+    const isActive = index < inputSequence.length;
+
     return (
-        <Container>
-            <Title>Capy Snake</Title>
-            <Subtitle>Entrez le code secret pour commencer</Subtitle>
-
-            <CodeDisplay>
-                {KONAMI_CODE.map((key, index) => renderKey(key, index))}
-            </CodeDisplay>
-
-            <Hint>↑ ↑ ↓ ↓ ← → ← → B A</Hint>
-        </Container>
+      <Key key={index} $active={isActive}>
+        {label}
+      </Key>
     );
+  };
+
+  return (
+    <Container>
+      <Title>Capy Snake</Title>
+      <Subtitle>ACCES SECURISE REQUIS</Subtitle>
+
+      <CodeDisplay>
+        {KONAMI_CODE.map((key, index) => renderKey(key, index))}
+      </CodeDisplay>
+
+      <Hint>↑ ↑ ↓ ↓ ← → ← → B A</Hint>
+    </Container>
+  );
 };
 
 export default KonamiLanding;
