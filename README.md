@@ -1,4 +1,4 @@
-# Capy Snake - Nuit de l'Info 2025 🥔🐍
+# Capy Snake - Nuit de l'Info 2025 🥜🐍
 
 **Thème : L'Océan ?**
 
@@ -74,4 +74,4 @@ Ce projet a été construit avec des technologies web modernes :
 Développé avec ❤️ par la **Team Capy** pour la Nuit de l'Info 2025.
 
 ---
-*Ok I pull up!* 🥔
+*Ok I pull up!* 🥜
