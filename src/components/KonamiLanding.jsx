@@ -101,10 +101,53 @@ const KONAMI_CODE = [
   'b', 'a'
 ];
 
+const MobileButton = styled.button`
+  background: transparent;
+  border: 2px solid #00f3ff;
+  color: #00f3ff;
+  padding: 1rem 2rem;
+  font-size: 1.5rem;
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+  transition: all 0.3s ease;
+  margin-top: 2rem;
+  animation: ${blink} 2s infinite;
+
+  &:hover {
+    background: rgba(0, 243, 255, 0.1);
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
+    transform: scale(1.05);
+  }
+`;
+
+const MobileMessage = styled.p`
+  color: #bc13fe;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 5px rgba(188, 19, 254, 0.5);
+`;
+
 const KonamiLanding = ({ onUnlock }) => {
   const [inputSequence, setInputSequence] = useState([]);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent));
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return; // Don't listen for keys on mobile (or do, but it's less relevant)
+
     const handleKeyDown = (e) => {
       const { key } = e;
 
@@ -130,7 +173,7 @@ const KonamiLanding = ({ onUnlock }) => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onUnlock]);
+  }, [onUnlock, isMobile]);
 
   const renderKey = (key, index) => {
     let label = key;
@@ -155,11 +198,21 @@ const KonamiLanding = ({ onUnlock }) => {
       <Title>Capy Snake</Title>
       <Subtitle>ACCES SECURISE REQUIS</Subtitle>
 
-      <CodeDisplay>
-        {KONAMI_CODE.map((key, index) => renderKey(key, index))}
-      </CodeDisplay>
-
-      <Hint>↑ ↑ ↓ ↓ ← → ← → B A</Hint>
+      {isMobile ? (
+        <>
+          <MobileMessage>Détection d'un terminal mobile...</MobileMessage>
+          <MobileButton onClick={onUnlock}>
+            Lancer le protocole
+          </MobileButton>
+        </>
+      ) : (
+        <>
+          <CodeDisplay>
+            {KONAMI_CODE.map((key, index) => renderKey(key, index))}
+          </CodeDisplay>
+          <Hint>↑ ↑ ↓ ↓ ← → ← → B A</Hint>
+        </>
+      )}
     </Container>
   );
 };
