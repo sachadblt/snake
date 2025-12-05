@@ -27,6 +27,8 @@ const Container = styled.div`
   font-family: 'Orbitron', sans-serif;
   text-align: center;
   animation: ${fadeIn} 1s ease-in-out;
+  padding: 1rem;
+  box-sizing: border-box;
 `;
 
 const Title = styled.h1`
@@ -41,6 +43,7 @@ const Title = styled.h1`
 
   @media (max-width: 768px) {
     font-size: 2.5rem;
+    letter-spacing: 0.2rem;
   }
 `;
 
@@ -51,6 +54,31 @@ const Subtitle = styled.p`
   letter-spacing: 2px;
   color: #bc13fe;
   text-shadow: 0 0 5px rgba(188, 19, 254, 0.5);
+  
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+  }
+`;
+
+const DesktopContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+const MobileContent = styled.div`
+  display: none;
+  flex-direction: column;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
 `;
 
 const CodeDisplay = styled.div`
@@ -59,11 +87,6 @@ const CodeDisplay = styled.div`
   margin-bottom: 3rem;
   font-size: 2rem;
   font-weight: bold;
-  
-  @media (max-width: 768px) {
-    gap: 0.5rem;
-    font-size: 1.5rem;
-  }
 `;
 
 const Key = styled.span`
@@ -81,7 +104,7 @@ const Key = styled.span`
   border-color: ${props => props.$active ? '#00f3ff' : 'rgba(0, 243, 255, 0.3)'};
   transform: ${props => props.$active ? 'scale(1.1)' : 'scale(1)'};
   box-shadow: ${props => props.$active ? '0 0 20px rgba(0, 243, 255, 0.6)' : '0 0 10px rgba(0, 243, 255, 0.1)'};
-  font-family: 'Outfit', sans-serif; /* Keep arrows readable */
+  font-family: 'Outfit', sans-serif;
 `;
 
 const Hint = styled.div`
@@ -93,128 +116,116 @@ const Hint = styled.div`
   text-shadow: 0 0 5px rgba(188, 19, 254, 0.5);
 `;
 
-const KONAMI_CODE = [
-  'ArrowUp', 'ArrowUp',
-  'ArrowDown', 'ArrowDown',
-  'ArrowLeft', 'ArrowRight',
-  'ArrowLeft', 'ArrowRight',
-  'b', 'a'
-];
-
 const MobileButton = styled.button`
-  background: transparent;
+  background: rgba(0, 243, 255, 0.1);
   border: 2px solid #00f3ff;
   color: #00f3ff;
-  padding: 1rem 2rem;
-  font-size: 1.5rem;
+  padding: 1.2rem 2.5rem;
+  font-size: 1.2rem;
   font-family: 'Orbitron', sans-serif;
   text-transform: uppercase;
   letter-spacing: 2px;
   cursor: pointer;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
   transition: all 0.3s ease;
-  margin-top: 2rem;
-  animation: ${blink} 2s infinite;
+  margin-top: 1rem;
+  animation: ${blink} 3s infinite;
+  width: 100%;
+  max-width: 300px;
 
-  &:hover {
-    background: rgba(0, 243, 255, 0.1);
-    box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
+  &:hover, &:active {
+    background: rgba(0, 243, 255, 0.2);
+    box-shadow: 0 0 25px rgba(0, 243, 255, 0.6);
     transform: scale(1.05);
   }
 `;
 
 const MobileMessage = styled.p`
   color: #bc13fe;
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
   text-shadow: 0 0 5px rgba(188, 19, 254, 0.5);
+  opacity: 0.9;
 `;
 
+const KONAMI_CODE = [
+    'ArrowUp', 'ArrowUp',
+    'ArrowDown', 'ArrowDown',
+    'ArrowLeft', 'ArrowRight',
+    'ArrowLeft', 'ArrowRight',
+    'b', 'a'
+];
+
 const KonamiLanding = ({ onUnlock }) => {
-  const [inputSequence, setInputSequence] = useState([]);
-  const [isMobile, setIsMobile] = useState(false);
+    const [inputSequence, setInputSequence] = useState([]);
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent));
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            const { key } = e;
+
+            setInputSequence((prev) => {
+                const newSequence = [...prev, key];
+
+                // Check if the new sequence matches the beginning of the Konami code
+                const isMatchSoFar = newSequence.every((k, i) => k === KONAMI_CODE[i]);
+
+                if (!isMatchSoFar) {
+                    // If wrong key, reset, but check if the key itself starts the sequence (ArrowUp)
+                    return key === KONAMI_CODE[0] ? [key] : [];
+                }
+
+                if (newSequence.length === KONAMI_CODE.length) {
+                    onUnlock();
+                    return [];
+                }
+
+                return newSequence;
+            });
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onUnlock]);
+
+    const renderKey = (key, index) => {
+        let label = key;
+        if (key === 'ArrowUp') label = '↑';
+        if (key === 'ArrowDown') label = '↓';
+        if (key === 'ArrowLeft') label = '←';
+        if (key === 'ArrowRight') label = '→';
+        if (key === 'b') label = 'B';
+        if (key === 'a') label = 'A';
+
+        const isActive = index < inputSequence.length;
+
+        return (
+            <Key key={index} $active={isActive}>
+                {label}
+            </Key>
+        );
     };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  useEffect(() => {
-    if (isMobile) return; // Don't listen for keys on mobile (or do, but it's less relevant)
-
-    const handleKeyDown = (e) => {
-      const { key } = e;
-
-      setInputSequence((prev) => {
-        const newSequence = [...prev, key];
-
-        // Check if the new sequence matches the beginning of the Konami code
-        const isMatchSoFar = newSequence.every((k, i) => k === KONAMI_CODE[i]);
-
-        if (!isMatchSoFar) {
-          // If wrong key, reset, but check if the key itself starts the sequence (ArrowUp)
-          return key === KONAMI_CODE[0] ? [key] : [];
-        }
-
-        if (newSequence.length === KONAMI_CODE.length) {
-          onUnlock();
-          return [];
-        }
-
-        return newSequence;
-      });
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onUnlock, isMobile]);
-
-  const renderKey = (key, index) => {
-    let label = key;
-    if (key === 'ArrowUp') label = '↑';
-    if (key === 'ArrowDown') label = '↓';
-    if (key === 'ArrowLeft') label = '←';
-    if (key === 'ArrowRight') label = '→';
-    if (key === 'b') label = 'B';
-    if (key === 'a') label = 'A';
-
-    const isActive = index < inputSequence.length;
 
     return (
-      <Key key={index} $active={isActive}>
-        {label}
-      </Key>
+        <Container>
+            <Title>Capy Snake</Title>
+            <Subtitle>ACCES SECURISE REQUIS</Subtitle>
+
+            <DesktopContent>
+                <CodeDisplay>
+                    {KONAMI_CODE.map((key, index) => renderKey(key, index))}
+                </CodeDisplay>
+                <Hint>↑ ↑ ↓ ↓ ← → ← → B A</Hint>
+            </DesktopContent>
+
+            <MobileContent>
+                <MobileMessage>Terminal mobile détecté...</MobileMessage>
+                <MobileButton onClick={onUnlock}>
+                    Lancer le protocole
+                </MobileButton>
+            </MobileContent>
+        </Container>
     );
-  };
-
-  return (
-    <Container>
-      <Title>Capy Snake</Title>
-      <Subtitle>ACCES SECURISE REQUIS</Subtitle>
-
-      {isMobile ? (
-        <>
-          <MobileMessage>Détection d'un terminal mobile...</MobileMessage>
-          <MobileButton onClick={onUnlock}>
-            Lancer le protocole
-          </MobileButton>
-        </>
-      ) : (
-        <>
-          <CodeDisplay>
-            {KONAMI_CODE.map((key, index) => renderKey(key, index))}
-          </CodeDisplay>
-          <Hint>↑ ↑ ↓ ↓ ← → ← → B A</Hint>
-        </>
-      )}
-    </Container>
-  );
 };
 
 export default KonamiLanding;
