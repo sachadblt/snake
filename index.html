@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Capy Snake - Nuit de l'Info 2025</title>
+    <title>Capy Snake - Konami Edition</title>
 
     <meta name="description" content="Un jeu de Snake 3D avec un Capybara. Thème : L'Océan ?" />
     <meta name="theme-color" content="#0f2027" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥔</text></svg>">
 
@@ -19,14 +19,13 @@
             --bg-deep: #0f2027;
             --bg-mid: #203a43;
             --bg-light: #2c5364;
-            --accent-color: #00bcd4; /* Cyan Océan */
-            --accent-glow: #b2ebf2;
+            --accent-color: #00bcd4;
+            --key-bg: rgba(255, 255, 255, 0.1);
+            --key-border: rgba(255, 255, 255, 0.3);
             --text-color: #ffffff;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
@@ -43,10 +42,10 @@
             width: 100%;
             height: 100%;
             position: relative;
-            z-index: 10; /* Au-dessus des bulles */
+            z-index: 10;
         }
 
-        /* --- UI Overlay (Glassmorphism) --- */
+        /* --- UI Overlay --- */
         .overlay-header {
             position: fixed;
             top: 20px;
@@ -63,50 +62,76 @@
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            pointer-events: none;
             z-index: 1000;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
         .brand {
             font-weight: 900;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: var(--accent-color);
             text-transform: uppercase;
             letter-spacing: 2px;
             text-shadow: 0 0 15px rgba(0, 188, 212, 0.6);
+        }
+
+        .brand span { color: white; }
+
+        /* --- Konami Instruction Styles --- */
+        .start-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .instruction-title {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            animation: pulseText 2s infinite;
+        }
+
+        .konami-sequence {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 800px;
+        }
+
+        .key {
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: var(--key-bg);
+            border: 2px solid var(--key-border);
+            border-radius: 8px;
+            font-family: 'Press Start 2P', monospace; /* Police Retro */
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+            transition: transform 0.1s;
         }
 
-        .brand span {
-            color: white;
+        .key:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 rgba(0,0,0,0);
         }
 
-        .event-tag {
-            background: rgba(0, 188, 212, 0.2);
-            color: var(--accent-glow);
-            padding: 5px 12px;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            border: 1px solid rgba(0, 188, 212, 0.3);
+        /* Animation de clignotement subtile */
+        @keyframes pulseText {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
         }
 
-        .overlay-footer {
-            position: fixed;
-            bottom: 20px;
-            width: 100%;
-            text-align: center;
-            pointer-events: none;
-            z-index: 1000;
-            font-size: 0.9rem;
-            opacity: 0.8;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-
-        /* --- Animation de fond (Bulles) --- */
+        /* --- Bubbles Background --- */
         .bubbles {
             position: absolute;
             width: 100%;
@@ -126,74 +151,55 @@
         .bubble:nth-child(2) { width: 20px; height: 20px; left: 20%; animation-duration: 5s; animation-delay: 1s; }
         .bubble:nth-child(3) { width: 50px; height: 50px; left: 35%; animation-duration: 7s; animation-delay: 2s; }
         .bubble:nth-child(4) { width: 80px; height: 80px; left: 50%; animation-duration: 11s; animation-delay: 0s; }
-        .bubble:nth-child(5) { width: 35px; height: 35px; left: 55%; animation-duration: 6s; animation-delay: 1s; }
-        .bubble:nth-child(6) { width: 45px; height: 45px; left: 65%; animation-duration: 8s; animation-delay: 3s; }
-        .bubble:nth-child(7) { width: 90px; height: 90px; left: 70%; animation-duration: 12s; animation-delay: 2s; }
-        .bubble:nth-child(8) { width: 25px; height: 25px; left: 80%; animation-duration: 6s; animation-delay: 2s; }
-        .bubble:nth-child(9) { width: 15px; height: 15px; left: 70%; animation-duration: 5s; animation-delay: 1s; }
-        .bubble:nth-child(10) { width: 90px; height: 90px; left: 25%; animation-duration: 10s; animation-delay: 4s; }
 
         @keyframes rise {
             0% { bottom: -100px; transform: translateX(0); }
-            50% { transform: translateX(100px); }
             100% { bottom: 1080px; transform: translateX(-200px); }
         }
 
-        /* --- Loading Screen --- */
-        .loading-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .pulse-loader {
-            font-size: 4rem;
-            animation: pulse 1.5s infinite ease-in-out;
-        }
-
-        .loading-text {
-            font-size: 1.2rem;
-            letter-spacing: 1px;
-            animation: blink 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.9); opacity: 0.7; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(0.9); opacity: 0.7; }
-        }
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        .overlay-footer {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            pointer-events: none;
+            z-index: 1000;
+            font-size: 0.8rem;
+            opacity: 0.7;
         }
     </style>
 </head>
 <body>
 
 <div class="bubbles">
-    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
-    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
-    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
-    <div class="bubble"></div>
+    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
 </div>
 
 <header class="overlay-header">
     <div class="brand">CAPY <span>SNAKE</span></div>
-    <div class="event-tag">NUIT DE L'INFO 2025</div>
+    <div style="font-size: 0.8rem; opacity: 0.8;">NUIT DE L'INFO</div>
 </header>
 
 <div id="root">
-    <div class="loading-container">
-        <div class="pulse-loader">🥔</div>
-        <p class="loading-text">Initialisation du Capybara...</p>
+    <div class="start-screen">
+        <h1 class="instruction-title">Entrez le Code Secret</h1>
+        <div class="konami-sequence">
+            <div class="key">↑</div>
+            <div class="key">↑</div>
+            <div class="key">↓</div>
+            <div class="key">↓</div>
+            <div class="key">←</div>
+            <div class="key">→</div>
+            <div class="key">←</div>
+            <div class="key">→</div>
+            <div class="key">B</div>
+            <div class="key">A</div>
+        </div>
     </div>
 </div>
 
 <footer class="overlay-footer">
-    <p>Team Capy <span style="color:var(--accent-color)">///</span> Le sauvetage de l'Océan commence ici</p>
+    <p>Team Capy • Sauvez l'océan, une patate à la fois.</p>
 </footer>
 
 <script type="module" src="/src/index.jsx"></script>
