@@ -36,8 +36,6 @@ const INITIAL_DIRECTION = { x: 1, y: 0 };
 const MODES = {
     CLASSIC: 'CLASSIC',
     RIVER: 'RIVER',
-    CLASSIC: 'CLASSIC',
-    RIVER: 'RIVER',
     CAPY_FPS: 'CAPY_FPS',
     BURROW: 'BURROW',
 };

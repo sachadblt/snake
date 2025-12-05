@@ -6,6 +6,7 @@ import { themes } from '../styles/theme'
 import AppRoutes from '../routes/routes'
 import AtmButton from '../components/atoms/AtmButton'
 import { useTranslation } from '../i18n/LanguageContext'
+import KonamiLanding from '../components/KonamiLanding'
 
 const AppContainer = styled.div`
   background-color: ${props => props.theme.colors.background};
@@ -19,12 +20,17 @@ const AppTitle = styled.h1`
 
 const App = () => {
   const [currentTheme, setCurrentTheme] = useState(() => localStorage.getItem('theme') || 'light')
+  const [isGameUnlocked, setIsGameUnlocked] = useState(false);
   const { t } = useTranslation()
 
   const toggleTheme = () => {
     const newTheme = currentTheme === 'light' ? 'dark' : 'light'
     setCurrentTheme(newTheme)
     localStorage.setItem('theme', newTheme)
+  }
+
+  if (!isGameUnlocked) {
+    return <KonamiLanding onUnlock={() => setIsGameUnlocked(true)} />;
   }
 
   return (
