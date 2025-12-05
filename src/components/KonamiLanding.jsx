@@ -93,119 +93,128 @@ const Hint = styled.div`
   text-shadow: 0 0 5px rgba(188, 19, 254, 0.5);
 `;
 
+const KONAMI_CODE = [
+  'ArrowUp', 'ArrowUp',
+  'ArrowDown', 'ArrowDown',
+  'ArrowLeft', 'ArrowRight',
+  'ArrowLeft', 'ArrowRight',
+  'b', 'a'
+];
+
 const MobileButton = styled.button`
-  display: none;
-  margin-top: 2rem;
-  padding: 1rem 2rem;
-  background: rgba(0, 243, 255, 0.1);
+  background: transparent;
   border: 2px solid #00f3ff;
-  border-radius: 8px;
   color: #00f3ff;
+  padding: 1rem 2rem;
+  font-size: 1.5rem;
   font-family: 'Orbitron', sans-serif;
-  font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 2px;
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
   transition: all 0.3s ease;
+  margin-top: 2rem;
+  animation: ${blink} 2s infinite;
 
   &:hover {
-    background: rgba(0, 243, 255, 0.2);
-    box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+    background: rgba(0, 243, 255, 0.1);
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
     transform: scale(1.05);
-  }
-
-  @media (max-width: 768px) {
-    display: block;
   }
 `;
 
 const MobileMessage = styled.p`
-  display: none;
   color: #bc13fe;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   margin-bottom: 1rem;
-  opacity: 0.8;
-  
-  @media (max-width: 768px) {
-    display: block;
-  }
+  text-shadow: 0 0 5px rgba(188, 19, 254, 0.5);
 `;
 
-const KONAMI_CODE = [
-    'ArrowUp', 'ArrowUp',
-    'ArrowDown', 'ArrowDown',
-    'ArrowLeft', 'ArrowRight',
-    'ArrowLeft', 'ArrowRight',
-    'b', 'a'
-];
-
 const KonamiLanding = ({ onUnlock }) => {
-    const [inputSequence, setInputSequence] = useState([]);
+  const [inputSequence, setInputSequence] = useState([]);
+  const [isMobile, setIsMobile] = useState(false);
 
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            const { key } = e;
-
-            setInputSequence((prev) => {
-                const newSequence = [...prev, key];
-
-                // Check if the new sequence matches the beginning of the Konami code
-                const isMatchSoFar = newSequence.every((k, i) => k === KONAMI_CODE[i]);
-
-                if (!isMatchSoFar) {
-                    // If wrong key, reset, but check if the key itself starts the sequence (ArrowUp)
-                    return key === KONAMI_CODE[0] ? [key] : [];
-                }
-
-                if (newSequence.length === KONAMI_CODE.length) {
-                    onUnlock();
-                    return [];
-                }
-
-                return newSequence;
-            });
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [onUnlock]);
-
-    const renderKey = (key, index) => {
-        let label = key;
-        if (key === 'ArrowUp') label = '↑';
-        if (key === 'ArrowDown') label = '↓';
-        if (key === 'ArrowLeft') label = '←';
-        if (key === 'ArrowRight') label = '→';
-        if (key === 'b') label = 'B';
-        if (key === 'a') label = 'A';
-
-        const isActive = index < inputSequence.length;
-
-        return (
-            <Key key={index} $active={isActive}>
-                {label}
-            </Key>
-        );
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent));
     };
 
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return; // Don't listen for keys on mobile (or do, but it's less relevant)
+
+    const handleKeyDown = (e) => {
+      const { key } = e;
+
+      setInputSequence((prev) => {
+        const newSequence = [...prev, key];
+
+        // Check if the new sequence matches the beginning of the Konami code
+        const isMatchSoFar = newSequence.every((k, i) => k === KONAMI_CODE[i]);
+
+        if (!isMatchSoFar) {
+          // If wrong key, reset, but check if the key itself starts the sequence (ArrowUp)
+          return key === KONAMI_CODE[0] ? [key] : [];
+        }
+
+        if (newSequence.length === KONAMI_CODE.length) {
+          onUnlock();
+          return [];
+        }
+
+        return newSequence;
+      });
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onUnlock, isMobile]);
+
+  const renderKey = (key, index) => {
+    let label = key;
+    if (key === 'ArrowUp') label = '↑';
+    if (key === 'ArrowDown') label = '↓';
+    if (key === 'ArrowLeft') label = '←';
+    if (key === 'ArrowRight') label = '→';
+    if (key === 'b') label = 'B';
+    if (key === 'a') label = 'A';
+
+    const isActive = index < inputSequence.length;
+
     return (
-        <Container>
-            <Title>Capy Snake</Title>
-            <Subtitle>ACCES SECURISE REQUIS</Subtitle>
-
-            <CodeDisplay>
-                {KONAMI_CODE.map((key, index) => renderKey(key, index))}
-            </CodeDisplay>
-
-            <Hint>↑ ↑ ↓ ↓ ← → ← → B A</Hint>
-
-            <MobileMessage>Comme vous êtes sur téléphone...</MobileMessage>
-            <MobileButton onClick={onUnlock}>
-                Lancer le jeu
-            </MobileButton>
-        </Container>
+      <Key key={index} $active={isActive}>
+        {label}
+      </Key>
     );
+  };
+
+  return (
+    <Container>
+      <Title>Capy Snake</Title>
+      <Subtitle>ACCES SECURISE REQUIS</Subtitle>
+
+      {isMobile ? (
+        <>
+          <MobileMessage>Détection d'un terminal mobile...</MobileMessage>
+          <MobileButton onClick={onUnlock}>
+            Lancer le protocole
+          </MobileButton>
+        </>
+      ) : (
+        <>
+          <CodeDisplay>
+            {KONAMI_CODE.map((key, index) => renderKey(key, index))}
+          </CodeDisplay>
+          <Hint>↑ ↑ ↓ ↓ ← → ← → B A</Hint>
+        </>
+      )}
+    </Container>
+  );
 };
 
 export default KonamiLanding;
