@@ -72,6 +72,3 @@ Ce projet a été construit avec des technologies web modernes :
 ## 👥 L'Équipe
 
 Développé avec ❤️ par la **Team Capy** pour la Nuit de l'Info 2025.
-
----
-*Ok I pull up!* 🥜
